@@ -16,8 +16,11 @@
 <body>
     <h1>GPS Location Saver</h1>
     <div id="mapid"></div>
+    <button id="location-button">Get Location</button><br />
+    <label for="name-field">Name:</label>
+    <input id="name-field" type="text" /><br />
     <button id="save-button">Save Location</button>
-    <button id="location-button">Get Location</button>
+
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
@@ -84,19 +87,27 @@
 
         saveButton.addEventListener("click", function () {
             const { lat, lng } = marker.getLatLng();
+
+            const nameField = document.querySelector("#name-field");
+            const name = nameField.value;
+
             const [Latitude, Longitude, Easting, Northing, UTMZone] = getUTM(lat, lng);
-            const data = [[Latitude, Longitude, Easting, Northing, UTMZone]];
+            const data = [[Latitude, Longitude, Easting, Northing, UTMZone, name]];
             const csvContent =
                 "data:text/csv;charset=utf-8," +
-                "Latitude,Longitude,Easting,Northing,UTM Zone\n" +
+                "\uFEFFLatitude,Longitude,Easting,Northing,UTM Zone,Name\n" +
                 data.map((d) => d.join(",")).join("\n");
+
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
             link.setAttribute("download", "location.csv");
             document.body.appendChild(link);
             link.click();
+            nameField.value = "";
+            nameField.focus();
         });
+
 
         // Select the location button element
         var locationButton = document.querySelector("#location-button");
